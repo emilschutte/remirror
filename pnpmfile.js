@@ -10,7 +10,7 @@ module.exports = {
 function readPackage(pkg) {
   const setDependency = createSetDependency(pkg);
 
-  setDependency('__NA__', '>=0');
+  setDependency('typescript', '^4.0.0-beta');
   return pkg;
 }
 
