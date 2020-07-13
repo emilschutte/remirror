@@ -43,6 +43,7 @@ import {
   startPositionOfParent,
   toDom,
   toHtml,
+  transformInvalidJSON,
 } from '../core-utils';
 
 describe('markActive', () => {
@@ -461,5 +462,101 @@ describe('fromHTML', () => {
     expect(
       fromHtml({ content, schema: testSchema, doc: domino.createDocument() }),
     ).toEqualProsemirrorNode(doc(p('Hello')));
+  });
+});
+
+describe('transformInvalidJSON', () => {
+  const validJSON = {
+    type: 'doc',
+    content: [
+      {
+        type: 'paragraph',
+        content: [
+          { type: 'text', text: 'This is the content ' },
+          {
+            type: 'text',
+            marks: [{ type: 'em' }, { type: 'strong' }],
+            text: 'That is strong and italic',
+          },
+        ],
+      },
+    ],
+  };
+
+  const invalidJSONMarks = {
+    type: 'doc',
+    content: [
+      {
+        type: 'paragraph',
+        content: [
+          { type: 'text', text: 'This is the content ' },
+          {
+            type: 'text',
+            marks: [
+              { type: 'em', attrs: { href: '//test.com' } },
+              { type: 'invalid' },
+              { type: 'strong' },
+              { type: 'asdf' },
+            ],
+            text: 'That is strong and italic',
+          },
+        ],
+      },
+    ],
+  };
+
+  const invalidJSONNode = {
+    type: 'doc',
+    content: [
+      {
+        type: 'invalid',
+        content: [
+          { type: 'text', text: 'This is the content ' },
+          {
+            type: 'text',
+            marks: [{ type: 'em' }, { type: 'strong' }],
+            text: 'That is strong and italic',
+          },
+        ],
+      },
+      {
+        type: 'paragraph',
+        content: [
+          {
+            type: 'invalid',
+            content: [{ type: 'text', marks: [{ type: 'em' }], text: 'asdf' }],
+          },
+        ],
+      },
+    ],
+  };
+
+  it('passes for valid json', () => {
+    const mock = jest.fn((x) => x);
+    expect(transformInvalidJSON(validJSON, testSchema, mock)).toBe(validJSON);
+  });
+
+  it('removes invalid nodes', () => {
+    const transformed = transformInvalidJSON(invalidJSONNode, testSchema, 'remove');
+    expect(transformed).toEqual({ type: 'doc', content: [{ type: 'paragraph', content: [] }] });
+  });
+
+  it('removes invalid marks', () => {
+    expect(transformInvalidJSON(invalidJSONMarks, testSchema, 'remove')).toEqual({
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [
+            { type: 'text', text: 'This is the content ' },
+            {
+              type: 'text',
+              marks: [{ type: 'em', attrs: { href: '//test.com' } }, { type: 'strong' }],
+              text: 'That is strong and italic',
+            },
+          ],
+        },
+      ],
+    });
   });
 });
