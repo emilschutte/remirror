@@ -10,8 +10,6 @@ import {
   ManagerPhase,
   OnSetOptionsParameter,
   PlainExtension,
-  Static,
-  StaticKeyList,
   Transaction,
 } from '@remirror/core';
 import { EditorState } from '@remirror/pm/state';
@@ -46,7 +44,7 @@ export interface PlaceholderOptions {
    * The class to decorate the empty top level node with. If you change this
    * then you will also need to apply your own styles.
    */
-  emptyNodeClass?: Static<string>;
+  emptyNodeClass?: string;
 }
 
 export interface PlaceholderPluginState extends Required<PlaceholderOptions> {
@@ -57,7 +55,6 @@ export interface PlaceholderPluginState extends Required<PlaceholderOptions> {
  * An extension for the remirror editor. CHANGE ME.
  */
 export class PlaceholderExtension extends PlainExtension<PlaceholderOptions> {
-  static readonly staticKeys: StaticKeyList<PlaceholderOptions> = ['emptyNodeClass'];
   static readonly handlerKeys: HandlerKeyList<PlaceholderOptions> = [];
   static readonly customHandlerKeys: CustomHandlerKeyList<PlaceholderOptions> = [];
 
@@ -96,7 +93,7 @@ export class PlaceholderExtension extends PlainExtension<PlaceholderOptions> {
   onSetOptions(parameter: OnSetOptionsParameter<PlaceholderOptions>) {
     const { changes } = parameter;
 
-    if (changes.placeholder && this.store.phase >= ManagerPhase.EditorView) {
+    if (changes.placeholder.changed && this.store.phase >= ManagerPhase.EditorView) {
       // update the attributes object
       this.store.updateAttributes();
     }
