@@ -3,6 +3,7 @@ import {
   CustomHandlerKeyList,
   DefaultPresetOptions,
   ExtensionPriority,
+  isEmptyObject,
   OnSetOptionsParameter,
   Preset,
 } from '@remirror/core';
@@ -45,19 +46,21 @@ export class CorePreset extends Preset<CorePresetOptions> {
    */
   protected onSetOptions(parameter: OnSetOptionsParameter<CorePresetOptions>) {
     const { pickChanged } = parameter;
+    const changedParagraphOptions = pickChanged(['indentAttribute', 'indentLevels']);
+    const changedBaseKeymapOptions = pickChanged([
+      'defaultBindingMethod',
+      'selectParentNodeOnEscape',
+      'excludeBaseKeymap',
+      'undoInputRuleOnBackspace',
+    ]);
 
-    this.getExtension(BaseKeymapExtension).setOptions(
-      pickChanged([
-        'defaultBindingMethod',
-        'selectParentNodeOnEscape',
-        'excludeBaseKeymap',
-        'undoInputRuleOnBackspace',
-      ]),
-    );
+    if (!isEmptyObject(changedParagraphOptions)) {
+      this.getExtension(ParagraphExtension).setOptions(changedParagraphOptions);
+    }
 
-    this.getExtension(ParagraphExtension).setOptions(
-      pickChanged(['indentAttribute', 'indentLevels']),
-    );
+    if (!isEmptyObject(changedBaseKeymapOptions)) {
+      this.getExtension(BaseKeymapExtension).setOptions(changedBaseKeymapOptions);
+    }
   }
 
   protected onAddCustomHandler: AddCustomHandler<CorePresetOptions> = (parameter) => {
