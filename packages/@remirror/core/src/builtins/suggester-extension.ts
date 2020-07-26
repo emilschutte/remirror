@@ -1,8 +1,17 @@
 import { ExtensionPriority } from '@remirror/core-constants';
 import { isArray } from '@remirror/core-helpers';
-import { suggest, Suggestion } from '@remirror/pm/suggest';
+import { CustomHandler, CustomHandlerKeyList } from '@remirror/core-types';
+import { addSuggester, suggest, Suggester } from '@remirror/pm/suggest';
 
 import { PlainExtension } from '../extension';
+import { AddCustomHandler } from '../extension/base-class';
+
+export interface SuggesterOptions {
+  /**
+   * The ability to add a suggester
+   */
+  suggester: CustomHandler<Suggester>;
+}
 
 /**
  * This extension allows others extension to add the `createSuggestion` method
@@ -15,7 +24,8 @@ import { PlainExtension } from '../extension';
  *
  * @builtin
  */
-export class SuggestionsExtension extends PlainExtension {
+export class SuggesterExtension extends PlainExtension<SuggesterOptions> {
+  static readonly staticKeys: CustomHandlerKeyList<SuggesterOptions> = ['suggester'];
   static readonly defaultPriority = ExtensionPriority.Default;
 
   get name() {
@@ -26,26 +36,36 @@ export class SuggestionsExtension extends PlainExtension {
    * Ensure that all ssr transformers are run.
    */
   onCreate = () => {
-    const suggesters: Suggestion[] = [];
+    const suggesters: Suggester[] = [];
 
     for (const extension of this.store.extensions) {
       if (
         // Manager settings excluded this from running
         this.store.managerSettings.exclude?.suggesters ||
         // Method doesn't exist
-        !extension.createSuggestions ||
+        !extension.createSuggesters ||
         // Extension settings exclude it from running
         extension.options.exclude?.suggesters
       ) {
         continue;
       }
 
-      const suggester = extension.createSuggestions();
-
-      suggesters.push(...(isArray(suggester) ? suggester : [suggester]));
+      const suggester = extension.createSuggesters();
+      const suggesterList = isArray(suggester) ? suggester : [suggester];
+      suggesters.push(...suggesterList);
     }
 
     this.store.addPlugins(suggest(...suggesters));
+  };
+
+  onAddCustomHandler: AddCustomHandler<SuggesterOptions> = ({ suggester }) => {
+    if (!suggester) {
+      return;
+    }
+
+    // Update the suggesters with the provided suggester. Returns the cleanup
+    // method.
+    return addSuggester(this.store.getState(), suggester);
   };
 }
 
@@ -53,7 +73,8 @@ declare global {
   namespace Remirror {
     interface ExcludeOptions {
       /**
-       * Whether to exclude the suggesters plugin configuration for the extension.
+       * Whether to exclude the suggesters plugin configuration for the
+       * extension.
        *
        * @defaultValue `undefined`
        */
@@ -62,16 +83,16 @@ declare global {
 
     interface ExtensionCreatorMethods {
       /**
-       * Create suggesters which respond to character key combinations within the
-       * editor instance.
+       * Create suggesters which respond to character key combinations within
+       * the editor instance.
        *
        * @remarks
        *
-       * Suggestions are a very powerful way of building up the editors
+       * Suggesters are a  powerful way of building up the editors
        * functionality. They can support `@` mentions, `#` tagging, `/` special
-       * command keys which trigger an actions menu and much more.
+       * command keys which trigger action menus and much more.
        */
-      createSuggestions?(): Suggestion[] | Suggestion;
+      createSuggesters?(): Suggester[] | Suggester;
     }
   }
 }
