@@ -1,11 +1,15 @@
 import {
   AddCustomHandler,
+  AnyCombinedUnion,
   CustomHandlerKeyList,
   DefaultPresetOptions,
   ExtensionPriority,
+  getLazyArray,
+  GetStaticAndDynamic,
   isEmptyObject,
   OnSetOptionsParameter,
   Preset,
+  RemirrorManager,
 } from '@remirror/core';
 import { BaseKeymapExtension, BaseKeymapOptions } from '@remirror/extension-base-keymap';
 import { DocExtension, DocOptions } from '@remirror/extension-doc';
@@ -110,4 +114,26 @@ export class CorePreset extends Preset<CorePresetOptions> {
       }),
     ];
   }
+}
+
+export interface CreateCoreManagerOptions extends Remirror.ManagerSettings {
+  /**
+   * The core preset options.
+   */
+  core?: GetStaticAndDynamic<CorePresetOptions>;
+}
+
+/**
+ * Create a manager with the core preset already applied.
+ */
+export function createCoreManager<Combined extends AnyCombinedUnion>(
+  combined: Combined[] | (() => Combined[]),
+  options: CreateCoreManagerOptions = {},
+) {
+  const { core, ...managerSettings } = options;
+
+  return RemirrorManager.create(
+    () => [...getLazyArray(combined), new CorePreset(core)],
+    managerSettings,
+  );
 }
