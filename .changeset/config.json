@@ -22,7 +22,6 @@
       "@remirror/dev",
       "@remirror/dom",
       "@remirror/extension-auto-link",
-      "@remirror/extension-base-keymap",
       "@remirror/extension-bidi",
       "@remirror/extension-blockquote",
       "@remirror/extension-bold",

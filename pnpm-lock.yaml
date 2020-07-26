@@ -384,16 +384,6 @@ importers:
       '@babel/runtime': ^7.10.5
       '@remirror/core': ^1.0.0-next.10
       '@remirror/pm': ^1.0.0-next.4
-  packages/@remirror/extension-base-keymap:
-    dependencies:
-      '@babel/runtime': 7.10.5
-    devDependencies:
-      '@remirror/core': 'link:../core'
-      '@remirror/pm': 'link:../pm'
-    specifiers:
-      '@babel/runtime': ^7.10.5
-      '@remirror/core': ^1.0.0-next.10
-      '@remirror/pm': 1.0.0-next.4
   packages/@remirror/extension-bidi:
     dependencies:
       '@babel/runtime': 7.10.5
@@ -898,7 +888,6 @@ importers:
   packages/@remirror/preset-core:
     dependencies:
       '@babel/runtime': 7.10.5
-      '@remirror/extension-base-keymap': 'link:../extension-base-keymap'
       '@remirror/extension-doc': 'link:../extension-doc'
       '@remirror/extension-history': 'link:../extension-history'
       '@remirror/extension-paragraph': 'link:../extension-paragraph'
@@ -910,7 +899,6 @@ importers:
     specifiers:
       '@babel/runtime': ^7.10.5
       '@remirror/core': ^1.0.0-next.10
-      '@remirror/extension-base-keymap': ^1.0.0-next.10
       '@remirror/extension-doc': ^1.0.0-next.10
       '@remirror/extension-history': ^1.0.0-next.10
       '@remirror/extension-paragraph': ^1.0.0-next.10
@@ -1545,7 +1533,6 @@ importers:
       '@remirror/core-utils': 'link:../@remirror/core-utils'
       '@remirror/dom': 'link:../@remirror/dom'
       '@remirror/extension-auto-link': 'link:../@remirror/extension-auto-link'
-      '@remirror/extension-base-keymap': 'link:../@remirror/extension-base-keymap'
       '@remirror/extension-bidi': 'link:../@remirror/extension-bidi'
       '@remirror/extension-blockquote': 'link:../@remirror/extension-blockquote'
       '@remirror/extension-bold': 'link:../@remirror/extension-bold'
@@ -1605,7 +1592,6 @@ importers:
       '@remirror/core-utils': ^1.0.0-next.8
       '@remirror/dom': ^1.0.0-next.10
       '@remirror/extension-auto-link': ^1.0.0-next.10
-      '@remirror/extension-base-keymap': ^1.0.0-next.10
       '@remirror/extension-bidi': ^1.0.0-next.10
       '@remirror/extension-blockquote': ^1.0.0-next.10
       '@remirror/extension-bold': ^1.0.0-next.10
@@ -1722,6 +1708,8 @@ importers:
   support/deprecated/editor-social:
     specifiers: {}
   support/deprecated/editor-wysiwyg:
+    specifiers: {}
+  support/deprecated/extension-base-keymap:
     specifiers: {}
   support/deprecated/extension-enhanced-link:
     specifiers: {}
@@ -16533,6 +16521,7 @@ packages:
     resolution:
       integrity: sha512-hk/69oAeaIzchq/v3lS50PXuzn5O2ynldopMC+SWBql7J2WtdptfB9dy8Y7+Og5rPkTCpn83zTiO8FMcqlXJ/g==
   /jsondiffpatch/0.4.1:
+    bundledDependencies: []
     dependencies:
       chalk: 2.4.2
       diff-match-patch: 1.0.5
